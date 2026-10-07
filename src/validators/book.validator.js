@@ -1,19 +1,23 @@
 import mongoose from 'mongoose';
 
 export const validateCreateBook = (req, res, next) => {
-    const { title, category, author } = req.body;
+    const { title, content, category, draft } = req.body;
     const errors = [];
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
         errors.push('Title is required');
     }
 
-    if (!category || !['Novel', 'Poem'].includes(category)) {
-        errors.push('Category must be either Novel or Poem');
+    if (!content || typeof content !== 'string' || content.trim().length === 0) {
+        errors.push('Book content is required');
     }
 
-    if (!author || !mongoose.Types.ObjectId.isValid(author)) {
-        errors.push('Valid author ID is required');
+    if (!category || !mongoose.Types.ObjectId.isValid(category)) {
+        errors.push('Valid category ID is required');
+    }
+
+    if (draft !== undefined && typeof draft !== 'boolean') {
+        errors.push('Draft must be a boolean');
     }
 
     if (errors.length > 0) {
@@ -27,7 +31,7 @@ export const validateCreateBook = (req, res, next) => {
 
 export const validateUpdateBook = (req, res, next) => {
     const errors = [];
-    const allowedFields = ['title', 'category', 'rating', 'draft'];
+    const allowedFields = ['title', 'description', 'content', 'category', 'draft'];
     const bodyKeys = Object.keys(req.body);
 
     if (bodyKeys.length === 0) {
@@ -43,12 +47,20 @@ export const validateUpdateBook = (req, res, next) => {
         );
     }
 
-    if (req.body.category && !['Novel', 'Poem'].includes(req.body.category)) {
-        errors.push('Category must be either Novel or Poem');
+    if (req.body.title !== undefined && (typeof req.body.title !== 'string' || req.body.title.trim().length === 0)) {
+        errors.push('Title cannot be empty');
     }
 
-    if (req.body.rating !== undefined && ![1, 2, 3].includes(req.body.rating)) {
-        errors.push('Rating must be 1, 2, or 3');
+    if (req.body.content !== undefined && (typeof req.body.content !== 'string' || req.body.content.trim().length === 0)) {
+        errors.push('Content cannot be empty');
+    }
+
+    if (req.body.category !== undefined && !mongoose.Types.ObjectId.isValid(req.body.category)) {
+        errors.push('Valid category ID is required');
+    }
+
+    if (req.body.draft !== undefined && typeof req.body.draft !== 'boolean') {
+        errors.push('Draft must be a boolean');
     }
 
     if (errors.length > 0) {

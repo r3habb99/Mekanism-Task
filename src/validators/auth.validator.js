@@ -1,5 +1,5 @@
 export const validateRegister = (req, res, next) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     const errors = [];
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -16,6 +16,13 @@ export const validateRegister = (req, res, next) => {
         errors.push('Password is required');
     } else if (password.length < 6) {
         errors.push('Password must be at least 6 characters');
+    }
+
+    if (role !== undefined) {
+        const validRoles = ['reader', 'author', 'admin', 'user'];
+        if (!validRoles.includes(role)) {
+            errors.push(`Role must be one of: ${validRoles.join(', ')}`);
+        }
     }
 
     if (errors.length > 0) {

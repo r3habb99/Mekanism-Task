@@ -47,12 +47,20 @@ export const login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user._id, role: user.role },
+            { id: user._id, role: user.role, email: user.email },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '7d' }
         );
 
-        return sendSuccess(res, 200, 'Login successful', { token });
+        return sendSuccess(res, 200, 'Login successful', {
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+        });
     } catch (error) {
         return sendError(res, 500, 'Server error', error.message);
     }
